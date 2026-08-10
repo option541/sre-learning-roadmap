@@ -4,5 +4,3 @@
 2026-08-04 21:00:04 GET /api/order 500
 2026-08-04 21:00:05 GET /index.html 200
 2026-08-04 21:00:06 GET /api/payment 503
-2026-08-04 21:10:01 GET /api/login 500
-2026-08-04 21:10:01 GET /api/login 500

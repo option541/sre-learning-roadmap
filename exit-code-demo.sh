@@ -42,8 +42,6 @@ echo "HTTP Check:"
 
 STATUS=$(curl -o /dev/null -s -w "%{http_code}" http://localhost:8080)
 
-CURL_EXIT_CODE=$?
-
 echo "HTTP Status: $STATUS"
 
 echo ""
@@ -61,5 +59,3 @@ fi
 
 
 echo ""
-
-echo "======================================"

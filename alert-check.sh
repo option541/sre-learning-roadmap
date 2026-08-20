@@ -1,44 +1,63 @@
 #!/bin/bash
 
-URL="http://localhost:8080"
-STATE_FILE="/home/zihang/sre-learning/failure-count"
+URL="${1:-http://localhost:8080}"
+FAILURE_FILE="failure-count"
+ALERT_STATE_FILE="alert-state"
 THRESHOLD=3
-
-COUNT=$(cat "$STATE_FILE")
-
-STATUS=$(curl -o /dev/null -s -w "%{http_code}" "$URL")
-CURL_EXIT_CODE=$?
 
 echo "=============================="
 echo "Time: $(date)"
 echo "URL: $URL"
+
+STATUS=$(curl -o /dev/null -s -w "%{http_code}" "$URL")
+CURL_EXIT_CODE=$?
+
+COUNT=$(cat "$FAILURE_FILE" 2>/dev/null || echo 0)
+ALERT_STATE=$(cat "$ALERT_STATE_FILE" 2>/dev/null || echo "OK")
+
 echo "HTTP Status: $STATUS"
 echo "Curl Exit Code: $CURL_EXIT_CODE"
 echo "Previous Failure Count: $COUNT"
+echo "Alert State: $ALERT_STATE"
 
-if [ "$CURL_EXIT_CODE" -ne 0 ] || [ "$STATUS" != "200" ]
+echo ""
+
+if [ "$CURL_EXIT_CODE" -eq 0 ] && [ "$STATUS" = "200" ]
 then
+
+    COUNT=0
+    echo "$COUNT" > "$FAILURE_FILE"
+
+    if [ "$ALERT_STATE" = "ALERT" ]
+    then
+        echo "RECOVERY: Service Recovered"
+        echo "OK" > "$ALERT_STATE_FILE"
+    else
+        echo "Service Healthy"
+    fi
+
+    exit 0
+
+else
+
     COUNT=$((COUNT + 1))
-
-    echo "$COUNT" > "$STATE_FILE"
-
-    echo "Current Failure Count: $COUNT"
+    echo "$COUNT" > "$FAILURE_FILE"
 
     if [ "$COUNT" -ge "$THRESHOLD" ]
     then
-        echo "ALERT: Service Down"
-        exit 1
+
+        if [ "$ALERT_STATE" = "OK" ]
+        then
+            echo "ALERT: Service Down"
+            echo "ALERT" > "$ALERT_STATE_FILE"
+        else
+            echo "Alert already active - no duplicate alert"
+        fi
+
     else
         echo "Warning: Service Failure Detected"
-        exit 0
     fi
-else
-    COUNT=0
 
-    echo "$COUNT" > "$STATE_FILE"
+    exit 1
 
-    echo "Current Failure Count: $COUNT"
-    echo "Service Healthy"
-
-    exit 0
 fi

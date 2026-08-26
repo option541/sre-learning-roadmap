@@ -1,0 +1,11 @@
+现象	优先怀疑
+docker ps 没有容器	Container
+docker ps -a 显示 Exited	Container / 应用进程
+Container Up，但应用进程没了	应用 / 进程
+没有 LISTEN :8080	进程 / 端口
+curl connection refused	监听/网络
+curl 超时	网络路径、防火墙、目标不可达
+HTTP 404	请求到了应用，但路径不存在
+HTTP 500	应用内部处理错误
+HTTP 502	上游服务异常/Nginx无法正常取得上游响应
+Container Up + HTTP 500	Docker 通常认为一切正常

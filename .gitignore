@@ -1,3 +1,20 @@
+# Logs
 *.log
+
+# Runtime state
+*.pid
+alert-state
+failure-count
+
+# Python
 __pycache__/
+*.pyc
+
+# Environment
 .env
+
+# Packages / installers
+*.deb
+
+# Temporary files
+notes.txt

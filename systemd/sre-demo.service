@@ -1,0 +1,6 @@
+[Unit]
+Description=SRE Demo Failure Service
+
+[Service]
+Type=oneshot
+ExecStart=/bin/sh -c 'echo "SRE demo starting"; echo "SRE demo intentional failure" >&2; exit 0'
